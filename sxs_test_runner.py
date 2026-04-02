@@ -1,6 +1,6 @@
 import csv
-import json
 import uuid
+import json
 from rapidfuzz import fuzz
 from google.cloud import dialogflowcx_v3 as dialogflow
 
@@ -35,7 +35,7 @@ def detect(agent_id, session_id, text):
     return " ".join(messages)
 
 
-def compare(res1, res2, expected):
+def judge(res1, res2, expected):
     score1 = fuzz.token_sort_ratio(res1, expected)
     score2 = fuzz.token_sort_ratio(res2, expected)
 
@@ -48,46 +48,40 @@ def compare(res1, res2, expected):
 
 def evaluate(csv_file):
     results = []
-    total = 0
 
     with open(csv_file, newline='', encoding='utf-8') as file:
         reader = csv.DictReader(file)
 
         for row in reader:
-            total += 1
-
             test_name = row["test_name"]
             user_input = row["input"]
             expected = row["expected"]
 
             session_id = str(uuid.uuid4())
 
-            res_v1 = detect(AGENT_V1, session_id, user_input)
-            res_v2 = detect(AGENT_V2, session_id, user_input)
+            res1 = detect(AGENT_V1, session_id, user_input)
+            res2 = detect(AGENT_V2, session_id, user_input)
 
-            winner = compare(res_v1, res_v2, expected)
+            winner = judge(res1, res2, expected)
 
             results.append({
                 "test_name": test_name,
                 "input": user_input,
                 "expected": expected,
-                "v1_response": res_v1,
-                "v2_response": res_v2,
+                "v1": res1,
+                "v2": res2,
                 "winner": winner
             })
 
             print(f"{test_name}: Winner → {winner}")
 
-    return {
-        "total": total,
-        "results": results
-    }
+    return {"results": results}
 
 
 if __name__ == "__main__":
     report = evaluate("testdata/sxs_tests.csv")
 
-    with open("reports/sxs_report.json", "w") as f:
+    with open("reports/autosxs_report.json", "w") as f:
         json.dump(report, f, indent=4)
 
-    print("\n✅ SxS Testing Completed")
+    print("\n✅ Auto SxS Completed")
