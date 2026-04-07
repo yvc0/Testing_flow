@@ -1,9 +1,19 @@
 [
   {
     "question": "What is fiber internet?",
-    "expected_contexts": [
-      "fiber internet uses optical fiber cables",
-      "high speed broadband using fiber optics"
+    "expected_contexts": ["fiber optic high speed internet"]
+  },
+  {
+    "test_name": "Multi-turn RAG",
+    "conversation": [
+      {
+        "user": "Tell me about fiber internet",
+        "expected_contexts": ["fiber optic"]
+      },
+      {
+        "user": "Is it faster than DSL?",
+        "expected_contexts": ["fiber faster than DSL"]
+      }
     ]
   }
 ]
