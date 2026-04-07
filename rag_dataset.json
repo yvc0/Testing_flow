@@ -1,0 +1,9 @@
+[
+  {
+    "question": "What is fiber internet?",
+    "expected_contexts": [
+      "fiber internet uses optical fiber cables",
+      "high speed broadband using fiber optics"
+    ]
+  }
+]
