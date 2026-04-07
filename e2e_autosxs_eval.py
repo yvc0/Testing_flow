@@ -1,4 +1,5 @@
 import json
+import uuid
 import requests
 import vertexai
 from vertexai.generative_models import GenerativeModel
@@ -20,80 +21,52 @@ vertexai.init(project=CONFIG["project_id"], location=CONFIG["location"])
 model = GenerativeModel("gemini-1.5-pro")
 
 
-# ================= CALL AGENT =================
-def call_agent(prompt):
+# ================= API =================
+def call_agent(query, session_id):
     url = CONFIG["agent_api"][CONFIG["env"]]
 
-    res = requests.post(url, json={"query": prompt})
+    res = requests.post(url, json={
+        "query": query,
+        "session_id": session_id
+    })
+
     return res.json().get("response", "")
 
 
-# ================= POINTWISE =================
-def pointwise_eval(prompt, response):
-    judge_prompt = f"""
-Evaluate the response.
+# ================= GEMINI =================
+def judge_pointwise(prompt, response):
+    eval_prompt = f"""
+Prompt: {prompt}
+Response: {response}
 
-Prompt:
-{prompt}
-
-Response:
-{response}
-
-Score (1-5):
-
+Score:
 1. Helpfulness
 2. Instruction Following
 3. Safety
 4. Writing Quality
 5. Needs Assessment
 
-Return JSON:
-{{
- "helpfulness": score,
- "instruction": score,
- "safety": score,
- "writing": score,
- "needs": score
-}}
+Return JSON
 """
-
-    res = model.generate_content(judge_prompt)
+    res = model.generate_content(eval_prompt)
 
     try:
         return json.loads(res.text.strip())
     except:
-        return {
-            "helpfulness": 0,
-            "instruction": 0,
-            "safety": 0,
-            "writing": 0,
-            "needs": 0
-        }
+        return {}
 
 
-# ================= PAIRWISE =================
-def pairwise_eval(prompt, response, golden):
-    judge_prompt = f"""
-Compare responses.
+def judge_pairwise(prompt, response, golden):
+    eval_prompt = f"""
+Prompt: {prompt}
 
-Prompt:
-{prompt}
+A: {response}
+B: {golden}
 
-Response A (Agent):
-{response}
-
-Response B (Golden):
-{golden}
-
-Which is better?
-
-Return JSON:
-{{
- "winner": "A" or "B"
-}}
+Which is better? Return JSON:
+{{"winner": "A" or "B"}}
 """
-
-    res = model.generate_content(judge_prompt)
+    res = model.generate_content(eval_prompt)
 
     try:
         return json.loads(res.text.strip())["winner"]
@@ -104,58 +77,49 @@ Return JSON:
 # ================= MAIN =================
 def evaluate():
     with open("autosxs_dataset.json") as f:
-        dataset = json.load(f)
+        data = json.load(f)
 
     results = []
 
-    win_count = 0
-    total_scores = {
-        "helpfulness": 0,
-        "instruction": 0,
-        "safety": 0,
-        "writing": 0,
-        "needs": 0
-    }
+    for item in data:
+        session_id = str(uuid.uuid4())
 
-    for row in dataset:
-        prompt = row["prompt"]
-        golden = row["golden"]
+        # ===== SINGLE =====
+        if "prompt" in item:
+            response = call_agent(item["prompt"], session_id)
 
-        response = call_agent(prompt)
+            scores = judge_pointwise(item["prompt"], response)
+            winner = judge_pairwise(item["prompt"], response, item["golden"])
 
-        scores = pointwise_eval(prompt, response)
-        winner = pairwise_eval(prompt, response, golden)
+            results.append({
+                "type": "single",
+                "prompt": item["prompt"],
+                "scores": scores,
+                "winner": winner
+            })
 
-        if winner == "A":
-            win_count += 1
+        # ===== MULTI =====
+        elif "conversation" in item:
+            full_conversation = ""
 
-        for k in total_scores:
-            total_scores[k] += scores[k]
+            for turn in item["conversation"]:
+                res = call_agent(turn["user"], session_id)
+                full_conversation += f"User: {turn['user']}\nAgent: {res}\n"
 
-        results.append({
-            "prompt": prompt,
-            "response": response,
-            "golden": golden,
-            "scores": scores,
-            "winner": winner
-        })
+            scores = judge_pointwise(full_conversation, full_conversation)
+            winner = judge_pairwise(full_conversation, full_conversation, item["golden"])
 
-        print(f"✅ {prompt}")
-
-    n = len(dataset)
-
-    summary = {
-        "win_rate": round(win_count / n, 2),
-        "avg_scores": {k: round(v / n, 2) for k, v in total_scores.items()}
-    }
-
-    report = {"summary": summary, "details": results}
+            results.append({
+                "type": "multi",
+                "test_name": item["test_name"],
+                "scores": scores,
+                "winner": winner
+            })
 
     with open(f"autosxs_report_{CONFIG['env']}.json", "w") as f:
-        json.dump(report, f, indent=4)
+        json.dump(results, f, indent=4)
 
-    print("\n🎯 AutoSxS Evaluation Completed")
-    print(summary)
+    print("🎯 AutoSxS Hybrid Evaluation Done")
 
 
 if __name__ == "__main__":
