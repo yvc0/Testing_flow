@@ -1,4 +1,5 @@
 import json
+import uuid
 import requests
 import vertexai
 from vertexai.generative_models import GenerativeModel
@@ -7,7 +8,7 @@ from vertexai.generative_models import GenerativeModel
 CONFIG = {
     "project_id": "your-project-id",
     "location": "us-central1",
-    "env": "staging",  # dev / staging / prod
+    "env": "staging",
     "rag_api": {
         "dev": "http://localhost:8000/rag",
         "staging": "https://staging-api/rag",
@@ -21,11 +22,15 @@ vertexai.init(project=CONFIG["project_id"], location=CONFIG["location"])
 model = GenerativeModel("gemini-1.5-pro")
 
 
-# ================= API CALL =================
-def call_rag(question):
+# ================= API =================
+def call_rag(query, session_id):
     url = CONFIG["rag_api"][CONFIG["env"]]
 
-    res = requests.post(url, json={"query": question})
+    res = requests.post(url, json={
+        "query": query,
+        "session_id": session_id
+    })
+
     data = res.json()
 
     return {
@@ -34,55 +39,30 @@ def call_rag(question):
     }
 
 
-# ================= METRIC 1 =================
-def context_recall_at_k(expected, actual, k):
-    actual_k = actual[:k]
-
-    match = 0
-    for exp in expected:
-        if any(exp.lower() in act.lower() for act in actual_k):
-            match += 1
-
+# ================= METRICS =================
+def context_recall(expected, actual, k):
+    actual = actual[:k]
+    match = sum(1 for e in expected if any(e.lower() in a.lower() for a in actual))
     return match / len(expected) if expected else 0
 
 
-# ================= GEMINI JUDGE =================
-def evaluate_with_gemini(question, answer, contexts):
-    context_text = "\n".join(contexts)
-
+def gemini_judge(question, answer, contexts):
     prompt = f"""
-You are an expert evaluator.
+Question: {question}
+Answer: {answer}
+Contexts: {" ".join(contexts)}
 
-Question:
-{question}
+Score:
+1. Grounding (1-5)
+2. Relevance (1-5)
 
-Answer:
-{answer}
-
-Contexts:
-{context_text}
-
-Evaluate:
-
-1. Grounding (Faithfulness):
-- Is answer fully supported by context?
-Score: 1-5
-
-2. Relevance:
-- Does answer directly answer the question?
-Score: 1-5
-
-Return ONLY JSON:
-{{
-  "grounding": score,
-  "relevance": score
-}}
+Return JSON:
+{{"grounding": score, "relevance": score}}
 """
-
-    response = model.generate_content(prompt)
+    res = model.generate_content(prompt)
 
     try:
-        return json.loads(response.text.strip())
+        return json.loads(res.text.strip())
     except:
         return {"grounding": 0, "relevance": 0}
 
@@ -90,56 +70,53 @@ Return ONLY JSON:
 # ================= MAIN =================
 def evaluate():
     with open("rag_dataset.json") as f:
-        dataset = json.load(f)
+        data = json.load(f)
 
     results = []
 
-    total_recall = 0
-    total_grounding = 0
-    total_relevance = 0
+    for item in data:
+        session_id = str(uuid.uuid4())
 
-    for row in dataset:
-        question = row["question"]
-        expected = row["expected_contexts"]
+        # ===== SINGLE TURN =====
+        if "question" in item:
+            rag = call_rag(item["question"], session_id)
 
-        rag_output = call_rag(question)
+            recall = context_recall(item["expected_contexts"], rag["contexts"], CONFIG["top_k"])
+            scores = gemini_judge(item["question"], rag["answer"], rag["contexts"])
 
-        answer = rag_output["answer"]
-        contexts = rag_output["contexts"]
+            results.append({
+                "type": "single",
+                "question": item["question"],
+                "recall": recall,
+                "scores": scores
+            })
 
-        recall = context_recall_at_k(expected, contexts, CONFIG["top_k"])
-        scores = evaluate_with_gemini(question, answer, contexts)
+        # ===== MULTI TURN =====
+        elif "conversation" in item:
+            conv_results = []
 
-        total_recall += recall
-        total_grounding += scores["grounding"]
-        total_relevance += scores["relevance"]
+            for turn in item["conversation"]:
+                rag = call_rag(turn["user"], session_id)
 
-        results.append({
-            "question": question,
-            "answer": answer,
-            "contexts": contexts,
-            "recall@k": round(recall, 2),
-            "grounding": scores["grounding"],
-            "relevance": scores["relevance"]
-        })
+                recall = context_recall(turn["expected_contexts"], rag["contexts"], CONFIG["top_k"])
+                scores = gemini_judge(turn["user"], rag["answer"], rag["contexts"])
 
-        print(f"✅ {question}")
+                conv_results.append({
+                    "user": turn["user"],
+                    "recall": recall,
+                    "scores": scores
+                })
 
-    n = len(dataset)
-
-    summary = {
-        "avg_recall@k": round(total_recall / n, 2),
-        "avg_grounding": round(total_grounding / n, 2),
-        "avg_relevance": round(total_relevance / n, 2)
-    }
-
-    report = {"summary": summary, "details": results}
+            results.append({
+                "type": "multi",
+                "test_name": item.get("test_name", ""),
+                "turns": conv_results
+            })
 
     with open(f"rag_report_{CONFIG['env']}.json", "w") as f:
-        json.dump(report, f, indent=4)
+        json.dump(results, f, indent=4)
 
-    print("\n🎯 RAG Evaluation Completed")
-    print(summary)
+    print("🎯 RAG Hybrid Evaluation Done")
 
 
 if __name__ == "__main__":
