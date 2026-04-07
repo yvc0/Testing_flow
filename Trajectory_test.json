@@ -1,0 +1,424 @@
+[
+  {
+    "test_name": "Simple Buy Intent",
+    "conversation": [
+      {
+        "user": "I want internet",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"intent": "buy"}}
+        ]
+      }
+    ]
+  },
+  {
+    "test_name": "Buy + Address",
+    "conversation": [
+      {
+        "user": "I need wifi connection",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"intent": "buy"}}
+        ]
+      },
+      {
+        "user": "my address is Hyderabad",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {"address": "Hyderabad"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Check Availability Only",
+    "conversation": [
+      {
+        "user": "Is fiber available in my area?",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Direct Address Input",
+    "conversation": [
+      {
+        "user": "Hyderabad Kukatpally address",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {"address": "Hyderabad Kukatpally"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Show Plans",
+    "conversation": [
+      {
+        "user": "show internet plans",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"action": "show_plans"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Invalid Address Format",
+    "conversation": [
+      {
+        "user": "my address is @@@###",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {"address": "@@@###"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Empty Input",
+    "conversation": [
+      {
+        "user": "",
+        "expected_tools": []
+      }
+    ]
+  },
+
+  {
+    "test_name": "Random Text",
+    "conversation": [
+      {
+        "user": "asdfghjkl",
+        "expected_tools": []
+      }
+    ]
+  },
+
+  {
+    "test_name": "Buy + Noise",
+    "conversation": [
+      {
+        "user": "Hi bro I want internet ASAP!!!",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"intent": "buy"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Address with Noise",
+    "conversation": [
+      {
+        "user": "my address is Hyderabad!!! 123",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {"address": "Hyderabad"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Partial Address",
+    "conversation": [
+      {
+        "user": "my area is Gachibowli",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {"address": "Gachibowli"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Multi Intent Confusion",
+    "conversation": [
+      {
+        "user": "I want internet and also check availability",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"intent": "buy"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Wrong Intent (Billing)",
+    "conversation": [
+      {
+        "user": "I have billing issue",
+        "expected_tools": []
+      }
+    ]
+  },
+
+  {
+    "test_name": "Upgrade Plan",
+    "conversation": [
+      {
+        "user": "upgrade my internet plan",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"action": "upgrade"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Downgrade Plan",
+    "conversation": [
+      {
+        "user": "downgrade my plan",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"action": "downgrade"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Check Offers",
+    "conversation": [
+      {
+        "user": "any offers available?",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"action": "offers"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Greeting Only",
+    "conversation": [
+      {
+        "user": "hello",
+        "expected_tools": []
+      }
+    ]
+  },
+
+  {
+    "test_name": "Address Missing Value",
+    "conversation": [
+      {
+        "user": "my address is",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Case Sensitivity",
+    "conversation": [
+      {
+        "user": "HYDERABAD",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {"address": "HYDERABAD"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Mixed Language",
+    "conversation": [
+      {
+        "user": "internet kavali Hyderabad lo",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"intent": "buy"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Long Input",
+    "conversation": [
+      {
+        "user": "Hi I am looking for a high speed internet connection for my home in Hyderabad area with good plans",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"intent": "buy"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Address After Delay",
+    "conversation": [
+      {
+        "user": "I want internet",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"intent": "buy"}}
+        ]
+      },
+      {
+        "user": "ok wait my address is Kondapur",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {"address": "Kondapur"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Wrong Address Characters",
+    "conversation": [
+      {
+        "user": "addr##$$%",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {"address": "addr"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Numeric Address",
+    "conversation": [
+      {
+        "user": "123456",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {"address": "123456"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Emoji Input",
+    "conversation": [
+      {
+        "user": "📶 internet pls",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"intent": "buy"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Special Characters",
+    "conversation": [
+      {
+        "user": "!@#$%^&*()",
+        "expected_tools": []
+      }
+    ]
+  },
+
+  {
+    "test_name": "Plan Price Query",
+    "conversation": [
+      {
+        "user": "what is the price of plans?",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"action": "pricing"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Speed Query",
+    "conversation": [
+      {
+        "user": "what speed do you provide?",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"action": "speed_info"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Cancel Service",
+    "conversation": [
+      {
+        "user": "cancel my internet",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"action": "cancel"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Ambiguous Query",
+    "conversation": [
+      {
+        "user": "tell me about it",
+        "expected_tools": []
+      }
+    ]
+  },
+
+  {
+    "test_name": "Multiple Address Mentions",
+    "conversation": [
+      {
+        "user": "Hyderabad Gachibowli Kondapur",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {"address": "Hyderabad"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Repeated Input",
+    "conversation": [
+      {
+        "user": "internet internet internet",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"intent": "buy"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Short Query",
+    "conversation": [
+      {
+        "user": "wifi?",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"intent": "buy"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Address With Pin",
+    "conversation": [
+      {
+        "user": "Hyderabad 500081",
+        "expected_tools": [
+          {"tool": "mcp_address_validator", "params": {"address": "Hyderabad"}}
+        ]
+      }
+    ]
+  },
+
+  {
+    "test_name": "Delayed Intent",
+    "conversation": [
+      {
+        "user": "hello",
+        "expected_tools": []
+      },
+      {
+        "user": "I need internet",
+        "expected_tools": [
+          {"tool": "sales_tool", "params": {"intent": "buy"}}
+        ]
+      }
+    ]
+  }
+]
