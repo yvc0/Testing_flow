@@ -1,38 +1,38 @@
 [
   {
     "input": "what are the internet plans available?",
-    "context": "GFiber offers lifestyle plans (Core 1 Gig, Home 3 Gig, Edge 8 Gig), original plans (1, 2, 5, 8 Gig), Webpass plans (1 Gig, 2 Gig, 500 Mbps), and business plans (Business 1 Gig, Business 2 Gig).",
-    "candidate": "GFiber offers several internet plans including lifestyle plans (Core 1 Gig, Home 3 Gig, Edge 8 Gig), original plans (1 Gig, 2 Gig, 5 Gig, 8 Gig), Webpass-only plans (1 Gig, 2 Gig, 500 Meg), and business plans (Business 1 Gig and Business 2 Gig).",
-    "reference": "GFiber offers lifestyle, original, Webpass, and business internet plans with multiple speed options."
+    "context": "Gfiber offers several internet plans: Lifestyle Internet Plans include Core 1 Gig, Home 3 Gig, and Edge 8 Gig. Original Internet Plans include 1 Gig, 2 Gig, 5 Gig, and 8 Gig. Webpass-only Plans include 1 Gig, 2 Gig, and 500 Meg. Business Plans include Business 1 Gig and Business 2 Gig.",
+    "candidate": "Gfiber offers several internet plans including lifestyle plans, original plans, webpass plans, and business plans.",
+    "reference": "Gfiber offers Core 1 Gig, Home 3 Gig, Edge 8 Gig, 1 Gig, 2 Gig, 5 Gig, 8 Gig, Webpass 1 Gig, 2 Gig, 500 Meg, and Business 1 Gig and 2 Gig plans."
   },
   {
     "input": "what speeds are available in gfiber plans?",
-    "context": "GFiber provides speeds such as 1 Gbps, 2 Gbps, 5 Gbps, 8 Gbps, and 500 Mbps across different plans.",
-    "candidate": "GFiber plans offer various symmetrical speeds including Core 1 Gig (1 Gbps), original plans (1, 2, 5, 8 Gbps), and Webpass plans (500 Mbps, 1 Gbps, 2 Gbps), along with business plans.",
-    "reference": "GFiber offers speeds ranging from 500 Mbps to 8 Gbps depending on the plan."
+    "context": "Gfiber plans offer symmetrical speeds: Core 1 Gig (1 Gbps), Original Plans include 1 Gig, 2 Gig, 5 Gig, and 8 Gig. Webpass plans include 1 Gig, 2 Gig, and 500 Mbps. Business plans include 1 Gig and 2 Gig.",
+    "candidate": "Gfiber plans offer various symmetrical speeds including 1 Gbps, 2 Gbps, 5 Gbps, 8 Gbps, and 500 Mbps.",
+    "reference": "Available speeds include 1 Gbps, 2 Gbps, 5 Gbps, 8 Gbps, and 500 Mbps."
   },
   {
     "input": "what are gfiber business plans?",
-    "context": "GFiber business plans include Business 1 Gig and Business 2 Gig designed for small and medium businesses.",
-    "candidate": "GFiber Business plans include Business 1 Gig and Business 2 Gig. These plans are designed for Small and Medium Businesses (SMBs) and have different terms, conditions, and pricing than residential plans.",
-    "reference": "Business 1 Gig and Business 2 Gig plans are available for SMB customers."
+    "context": "Gfiber Business plans include Business 1 Gig and Business 2 Gig. These are designed for small and medium businesses and may include SLA features.",
+    "candidate": "Gfiber Business plans include Business 1 Gig and Business 2 Gig designed for SMBs.",
+    "reference": "Business plans include Business 1 Gig and Business 2 Gig for small and medium businesses."
   },
   {
-    "input": "what is 8 gig plan, can you explain ?",
-    "context": "The 8 Gig plan offers approximately 8 Gbps speed and supports high-speed Wi-Fi 6 for compatible devices.",
-    "candidate": "The 8 Gig plan is one of GFiber's original internet plans, offering symmetrical speeds of approximately 8 Gigabits per second (Gbps) and supports whole-home Wi-Fi 6 speeds.",
-    "reference": "The 8 Gig plan provides around 8 Gbps speed with high-performance Wi-Fi capabilities."
+    "input": "what is 8 gig plan, can you explain?",
+    "context": "The 8 Gig plan offers symmetrical speeds of approximately 8 Gbps and provides whole-home Wi-Fi 6 speeds for compatible devices.",
+    "candidate": "The 8 Gig plan provides speeds up to 8 Gbps with high performance Wi-Fi support.",
+    "reference": "The 8 Gig plan offers approximately 8 Gbps speeds with Wi-Fi 6 support."
   },
   {
     "input": "what is included in lifestyle internet plans?",
-    "context": "Lifestyle plans include Core 1 Gig, Home 3 Gig, and Edge 8 Gig.",
-    "candidate": "GFiber's lifestyle internet plans include Core 1 Gig, Home 3 Gig, and Edge 8 Gig. These plans are designed to meet specific online needs.",
+    "context": "Lifestyle Internet Plans include Core 1 Gig, Home 3 Gig, and Edge 8 Gig designed for different user needs.",
+    "candidate": "Lifestyle plans include Core 1 Gig, Home 3 Gig, and Edge 8 Gig.",
     "reference": "Lifestyle plans include Core 1 Gig, Home 3 Gig, and Edge 8 Gig."
   },
   {
     "input": "Gfiber is available at my address mock_address_id_123?",
-    "context": "Availability depends on service location and must be checked using official GFiber website or support.",
-    "candidate": "To check if GFiber is available at your address, please visit https://gfiber.com/. If you believe there is an error or if you live on a private road, you can contact GFiber customer support.",
-    "reference": "GFiber availability must be checked using the official website or customer support."
+    "context": "To check availability, users need to visit the official website or contact support. Availability depends on location.",
+    "candidate": "Please check the Gfiber website or contact support to confirm availability at your address.",
+    "reference": "Check availability via website or support as it depends on your location."
   }
 ]
